@@ -1,0 +1,20 @@
+#cloud-config
+
+# sets up veilid to run automatically
+runcmd:
+    - wget -O- https://packages.veilid.net/gpg/veilid-packages-key.public | gpg --dearmor -o /usr/share/keyrings/veilid-packages-keyring.gpg
+    - echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/veilid-packages-keyring.gpg] https://packages.veilid.net/apt stable main" > /etc/apt/sources.list.d/veilid.list
+    - apt-get update
+    - DEBIAN_FRONTEND=noninteractive apt-get install -y veilid-server veilid-cli
+    # the public IP is 1:1 NATed to the private address of the server, so let veilid detect its public address
+    - 'sed -i ''/^ *network:/a \    detect_address_changes: true'' /etc/veilid-server/veilid-server.conf'
+    - systemctl enable --now veilid-server.service
+
+# set up automatic updates just for these two packages every day at 5AM
+write_files:
+    - owner: root:root
+      path: /etc/cron.d/veilid-updates
+      permissions: '0644'
+      content: |
+          0 5 * * * root /usr/bin/apt-get update -y
+          5 5 * * * root DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get install --only-upgrade veilid-server veilid-cli -y
