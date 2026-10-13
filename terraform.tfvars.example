@@ -1,0 +1,9 @@
+# copy this file to terraform.tfvars and fill in your values
+project_id     = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+ssh_public_key = "ssh-ed25519 AAAA... you@example.com"
+
+# optional overrides
+# region             = "eu01"
+# availability_zones = ["eu01-1"]
+# machine_type       = "g2i.1"
+# ssh_allowed_cidrs  = ["203.0.113.10/32"]
